@@ -24,12 +24,41 @@ namespace MyCleanApi.Api.Controllers
             return Ok(result); //Returnerar resultat tillbaka till klienten
         }
 
+            //GET by id
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id) //HTTP GET-Endpoint - hämtar ett specifikt to-do item
+        {
+            var result = await _mediator.Send(new GetTodoItemByIdQuery(id));
+            return result is null ? NotFound() : Ok(result);
+        }
+
             //POST
         [HttpPost]
         public async Task<IActionResult> Create(CreateTodoItemCommand command) //HTTP POST-Endpoint - skapa nytt to-do item och spara den
         {
             var id = await _mediator.Send(command); //Metod för att skicka command och invänta svar
             return Ok(id); //Returnerar resultat (ID) tillbaka till klienten
+        }
+
+            //PUT
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateTodoItemCommand command) //HTTP PUT-Endpoint - uppdaterar ett befintligt to-do item
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("Id in route must match Id in body.");
+            }
+
+            var updated = await _mediator.Send(command);
+            return updated ? NoContent() : NotFound();
+        }
+
+            //DELETE
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id) //HTTP DELETE-Endpoint - tar bort ett to-do item
+        {
+            var deleted = await _mediator.Send(new DeleteTodoItemCommand(id));
+            return deleted ? NoContent() : NotFound();
         }
     }
 }
