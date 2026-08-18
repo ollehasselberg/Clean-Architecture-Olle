@@ -8,6 +8,7 @@ using DomainLayer.Entities;
 
 namespace DomainLayer.Interfaces
 {
+    // Repository Pattern: definieras i Domain, implementeras i Infrastructure - ApplicationLayer känner bara till detta interface
     public interface ITodoItemRepository
     {
         Task<List<TodoItem>> GetAllAsync();

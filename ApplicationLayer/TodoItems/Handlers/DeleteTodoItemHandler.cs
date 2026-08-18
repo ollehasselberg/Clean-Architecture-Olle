@@ -4,6 +4,7 @@ using ApplicationLayer.TodoItems.Commands;
 
 namespace ApplicationLayer.TodoItems.Handlers
 {
+    // Handler för DeleteTodoItemCommand: läser upp item och tar bort det om det finns
     public class DeleteTodoItemHandler
         : IRequestHandler<DeleteTodoItemCommand, bool>
     {

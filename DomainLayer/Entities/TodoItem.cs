@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DomainLayer.Entities
 {
+    // "Många"-sidan av relationen: varje TodoItem hör till exakt en TodoList
     public class TodoItem
     {
         public int Id { get; set; }

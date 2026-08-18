@@ -5,6 +5,7 @@ using ApplicationLayer.TodoLists.Commands;
 
 namespace ApplicationLayer.TodoLists.Handlers
 {
+    // Handler för CreateTodoListCommand: bygger entiteten och sparar den via repository
     public class CreateTodoListHandler
         : IRequestHandler<CreateTodoListCommand, int>
     {

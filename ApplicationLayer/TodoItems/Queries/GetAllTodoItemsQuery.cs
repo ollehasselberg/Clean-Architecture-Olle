@@ -8,6 +8,6 @@ using MediatR;
 
 namespace ApplicationLayer.TodoItems.Queries
 {
+    // Query: hämtar alla TodoItems
     public record GetAllTodoItemsQuery : IRequest<List<TodoItem>>;
-        //Hämtar alla to-do items
 }

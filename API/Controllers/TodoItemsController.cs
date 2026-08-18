@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MyCleanApi.Api.Controllers
 {
+    // Full CRUD för TodoItem - alla anrop går via MediatR till en Command/Query-handler i ApplicationLayer
     [ApiController]
     [Route("api/[controller]")]
     public class TodoItemsController : ControllerBase
@@ -29,7 +30,7 @@ namespace MyCleanApi.Api.Controllers
         public async Task<IActionResult> GetById(int id) //HTTP GET-Endpoint - hämtar ett specifikt to-do item
         {
             var result = await _mediator.Send(new GetTodoItemByIdQuery(id));
-            return result is null ? NotFound() : Ok(result);
+            return result is null ? NotFound() : Ok(result); //404 om det inte finns, annars 200 med item
         }
 
             //POST
@@ -46,11 +47,11 @@ namespace MyCleanApi.Api.Controllers
         {
             if (id != command.Id)
             {
-                return BadRequest("Id in route must match Id in body.");
+                return BadRequest("Id in route must match Id in body."); //Skydd mot att id i URL och body inte stämmer överens
             }
 
             var updated = await _mediator.Send(command);
-            return updated ? NoContent() : NotFound();
+            return updated ? NoContent() : NotFound(); //204 vid lyckad uppdatering, 404 om item inte hittades
         }
 
             //DELETE
@@ -58,7 +59,7 @@ namespace MyCleanApi.Api.Controllers
         public async Task<IActionResult> Delete(int id) //HTTP DELETE-Endpoint - tar bort ett to-do item
         {
             var deleted = await _mediator.Send(new DeleteTodoItemCommand(id));
-            return deleted ? NoContent() : NotFound();
+            return deleted ? NoContent() : NotFound(); //204 vid lyckad borttagning, 404 om item inte hittades
         }
     }
 }

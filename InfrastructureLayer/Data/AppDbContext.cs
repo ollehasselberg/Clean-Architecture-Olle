@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 
 namespace InfrastructureLayer.Data
 {
+    // EF Core-kopplingen mot SQL Server, konfigureras och registreras i API/Program.cs
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -19,6 +20,7 @@ namespace InfrastructureLayer.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // 1-till-många: en TodoList har flera TodoItems, kopplade via TodoListId (FK)
             modelBuilder.Entity<TodoList>()
                 .HasMany(x => x.Items)
                 .WithOne(x => x.TodoList)

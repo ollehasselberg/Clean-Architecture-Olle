@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
+    // Konkret implementation av ITodoItemRepository, pratar direkt med EF Core / AppDbContext
     public class TodoItemRepository : ITodoItemRepository
     {
         private readonly AppDbContext _context;

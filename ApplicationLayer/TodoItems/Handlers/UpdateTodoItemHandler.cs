@@ -4,6 +4,7 @@ using ApplicationLayer.TodoItems.Commands;
 
 namespace ApplicationLayer.TodoItems.Handlers
 {
+    // Handler för UpdateTodoItemCommand: läser upp item, uppdaterar fälten och sparar
     public class UpdateTodoItemHandler
         : IRequestHandler<UpdateTodoItemCommand, bool>
     {
@@ -21,7 +22,7 @@ namespace ApplicationLayer.TodoItems.Handlers
             var item = await _repo.GetByIdAsync(request.Id);
             if (item is null)
             {
-                return false;
+                return false; //Item fanns inte, controllern översätter detta till 404
             }
 
             item.Title = request.Title;
