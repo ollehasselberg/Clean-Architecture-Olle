@@ -12,6 +12,7 @@ namespace API
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
+            builder.Services.AddScoped<ITodoListRepository, TodoListRepository>();
 
             // Add services to the container.
 
