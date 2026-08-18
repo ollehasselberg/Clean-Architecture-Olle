@@ -1,84 +1,80 @@
 # Clean Architecture - Olle
 
-En ASP.NET Core Web API byggd enligt Clean Architecture-principerna, med CQRS (MediatR), Repository Pattern och Entity Framework Core mot SQL Server.
+Detta är min inlämningsuppgift i skolan! Det är en To-Do-list-API byggd i ASP.NET Core (.NET 8) som följer Clean Architecture. Man kan skapa listor och lägga till/ändra/ta bort saker i dem.
 
-## Arkitektur
+## Vad är Clean Architecture (kort förklarat)
 
-Projektet är uppdelat i fyra lager, var och en med ett tydligt ansvar och beroenden som bara pekar inåt:
+Grejen med Clean Architecture är att man delar upp koden i olika lager så att allt inte ligger hugget i sten i samma fil. Jag har fyra projekt/lager:
 
-```
-API  -->  ApplicationLayer  -->  DomainLayer
- |                                    ^
- '------> InfrastructureLayer --------'
-```
+- **DomainLayer** - detta är kärnan, här ligger bara mina entiteter (`TodoItem` och `TodoList`) och interfaces för mina repositories. Detta lager beror inte på något annat, det är typ "hjärtat".
+- **ApplicationLayer** - här ligger all logik för vad som ska hända, uppdelat i Commands (gör något, t.ex skapa) och Queries (hämta något). Jag använder MediatR-paketet för att koppla ihop dessa.
+- **InfrastructureLayer** - här pratar jag med databasen. Har min `AppDbContext` (EF Core) och de "riktiga" implementationerna av repository-interfacen från Domain.
+- **API** - detta är själva webb-API:et som man startar. Controllers här gör egentligen inte mycket, de bara skickar vidare requesten till MediatR som hittar rätt handler.
 
-- **DomainLayer** — entiteter (`TodoItem`, `TodoList`) och repository-interfaces (`ITodoItemRepository`, `ITodoListRepository`). Inga beroenden till andra lager.
-- **ApplicationLayer** — CQRS: Commands och Queries samt deras MediatR-handlers. Använder bara repository-interfacen från Domain, aldrig Infrastructure direkt.
-- **InfrastructureLayer** — `AppDbContext` (EF Core mot SQL Server) och konkreta repository-implementationer.
-- **API** — ASP.NET Core Web API. Controllers skickar allt via `IMediator`, ingen affärslogik ligger i controllern.
+Tanken är att man ska kunna byta ut t.ex databasen utan att behöva ändra i Domain/Application, för de vet inte ens att SQL Server finns.
 
-## Modeller och relation
+## Modellerna
 
-- `TodoList` (1) → `TodoItem` (många): en `TodoList` har flera `TodoItem`, varje `TodoItem` hör till exakt en `TodoList` (`TodoListId` FK).
+Jag har två entiteter:
+- `TodoList` - en lista med ett namn
+- `TodoItem` - en sak att göra, hör till en lista (`TodoListId`)
+
+Så en lista kan ha flera items, det är alltså en 1-till-många-relation.
 
 ## CQRS + MediatR
 
-Commands och Queries ligger separerade under `ApplicationLayer/TodoItems` och `ApplicationLayer/TodoLists` (t.ex. `Commands/CreateTodoItemCommand.cs`, `Queries/GetAllTodoItemsQuery.cs`). Varje controller-action skickar requesten via `IMediator.Send(...)` till motsvarande handler — controllern innehåller ingen affärslogik.
+Alla "actions" är antingen ett **Command** (ändrar något, t.ex `CreateTodoItemCommand`) eller en **Query** (hämtar något, t.ex `GetAllTodoItemsQuery`). De ligger i egna mappar under `ApplicationLayer` så det är lätt att hitta. Controllern skickar bara `_mediator.Send(command)` och väntar på svar, ingen logik ligger i controllern.
 
 ## Repository Pattern
 
-- Interface: `DomainLayer/Interfaces/ITodoItemRepository.cs`, `ITodoListRepository.cs`
-- Implementation: `InfrastructureLayer/Repositories/TodoItemRepository.cs`, `TodoListRepository.cs`
-- Handlers i ApplicationLayer beror bara på interfacen, aldrig på EF Core direkt.
+Interfacen (`ITodoItemRepository`, `ITodoListRepository`) ligger i `DomainLayer/Interfaces`, och de faktiska klasserna som pratar med EF Core ligger i `InfrastructureLayer/Repositories`. Handlers i ApplicationLayer känner bara till interfacet, inte hur det faktiskt är implementerat.
 
-## Kom igång lokalt
+## Hur man kör projektet
 
-### Krav
+### Man behöver
 - .NET 8 SDK
-- SQL Server LocalDB (följer med Visual Studio) eller valfri SQL Server-instans
+- SQL Server LocalDB (den brukar följa med om man har Visual Studio installerat)
 
-### 1. Klona och återställ
+### Steg 1 - klona ner det
 ```bash
 git clone https://github.com/ollehasselberg/Clean-Architecture-Olle.git
 cd Clean-Architecture-Olle
 dotnet restore
 ```
 
-### 2. Skapa databasen (kör migrations)
-Connection string finns i `API/appsettings.json` (`ConnectionStrings:DefaultConnection`), pekar mot lokal `(localdb)\MSSQLLocalDB` som standard.
+### Steg 2 - skapa databasen
+Connection stringen finns i `API/appsettings.json`, den pekar mot en lokal LocalDB som heter `TodoDb`.
 
 ```bash
-dotnet tool install --global dotnet-ef   # om du inte redan har den
+dotnet tool install --global dotnet-ef
 dotnet ef database update --project InfrastructureLayer --startup-project API
 ```
 
-### 3. Starta API:t
+### Steg 3 - kör igång API:t
 ```bash
 dotnet run --project API
 ```
-Swagger UI öppnas automatiskt på `https://localhost:7114/swagger` (eller `http://localhost:5086/swagger`).
+Då öppnas Swagger automatiskt i webbläsaren där man kan testa alla endpoints direkt.
 
-## API-endpoints
+## Endpoints
 
-| Metod | Endpoint | Beskrivning |
+| Metod | URL | Vad den gör |
 |---|---|---|
-| GET | `/api/todolists` | Hämta alla to-do-listor |
-| POST | `/api/todolists` | Skapa en ny to-do-lista |
-| GET | `/api/todoitems` | Hämta alla to-do-items |
-| GET | `/api/todoitems/{id}` | Hämta ett specifikt to-do-item |
-| POST | `/api/todoitems` | Skapa ett nytt to-do-item (kräver giltigt `todoListId`) |
-| PUT | `/api/todoitems/{id}` | Uppdatera ett to-do-item |
-| DELETE | `/api/todoitems/{id}` | Ta bort ett to-do-item |
+| GET | `/api/todolists` | hämta alla listor |
+| POST | `/api/todolists` | skapa en ny lista |
+| GET | `/api/todoitems` | hämta alla items |
+| GET | `/api/todoitems/{id}` | hämta ett item |
+| POST | `/api/todoitems` | skapa ett nytt item (behöver ett giltigt `todoListId`) |
+| PUT | `/api/todoitems/{id}` | uppdatera ett item |
+| DELETE | `/api/todoitems/{id}` | ta bort ett item |
 
-Full interaktiv dokumentation finns i Swagger UI när projektet körs.
+## Git-grejer
 
-## Gitflöde
-
-`main` är skyddad — inga direkta pushar tillåts, alla ändringar går via en feature-branch och en Pull Request:
+`main`-branchen är skyddad, så jag kan inte pusha direkt dit av misstag - allt måste gå via en Pull Request. Så här gör man en ändring:
 
 ```bash
-git checkout -b feature/mitt-tillagg
-# gör ändringar, committa
-git push -u origin feature/mitt-tillagg
-gh pr create   # eller skapa PR:en på github.com
+git checkout -b feature/nagot-jag-vill-lagga-till
+# gör ändringarna, committa dem
+git push -u origin feature/nagot-jag-vill-lagga-till
+# skapa PR på github.com och merga den
 ```
