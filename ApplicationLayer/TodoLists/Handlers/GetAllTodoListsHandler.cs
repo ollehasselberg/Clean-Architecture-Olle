@@ -5,6 +5,7 @@ using ApplicationLayer.TodoLists.Queries;
 
 namespace ApplicationLayer.TodoLists.Handlers
 {
+    // Handler för GetAllTodoListsQuery: delegerar rakt av till repository
     public class GetAllTodoListsHandler
         : IRequestHandler<GetAllTodoListsQuery, List<TodoList>>
     {

@@ -10,6 +10,7 @@ using ApplicationLayer.TodoItems.Commands;
 
 namespace ApplicationLayer.TodoItems.Handlers
 {
+    // Handler för CreateTodoItemCommand: bygger entiteten och sparar den via repository
     public class CreateTodoItemHandler
         : IRequestHandler<CreateTodoItemCommand, int>
     {

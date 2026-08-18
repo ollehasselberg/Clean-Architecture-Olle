@@ -10,6 +10,7 @@ using ApplicationLayer.TodoItems.Queries;
 
 namespace ApplicationLayer.TodoItems.Handlers
 {
+    // Handler för GetAllTodoItemsQuery: delegerar rakt av till repository
     public class GetAllTodoItemsHandler
         : IRequestHandler<GetAllTodoItemsQuery, List<TodoItem>>
     {

@@ -5,6 +5,7 @@ using ApplicationLayer.TodoItems.Queries;
 
 namespace ApplicationLayer.TodoItems.Handlers
 {
+    // Handler för GetTodoItemByIdQuery: hämtar ett enskilt item, null om det inte finns
     public class GetTodoItemByIdHandler
         : IRequestHandler<GetTodoItemByIdQuery, TodoItem?>
     {

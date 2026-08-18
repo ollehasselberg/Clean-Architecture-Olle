@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DomainLayer.Entities
 {
+    // "En"-sidan av relationen: en TodoList kan innehålla flera TodoItems
     public class TodoList
     {
         public int Id { get; set; }
