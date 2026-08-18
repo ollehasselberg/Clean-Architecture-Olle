@@ -1,3 +1,4 @@
+using ApplicationLayer.TodoItems.Commands;
 using DomainLayer.Interfaces;
 using InfrastructureLayer.Repositories;
 using InfrastructureLayer.Data;
@@ -15,6 +16,8 @@ namespace API
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(typeof(CreateTodoItemCommand).Assembly));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
